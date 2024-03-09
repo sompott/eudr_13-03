@@ -35,6 +35,9 @@ def index():
 @app.route('/pdpa')
 def pdpa():
     return render_template('pdpa.html')
+@app.route('/pdpa1')
+def pdpa1():
+    return render_template('pdpa1.html')
 @app.route('/farmer')
 def farmer():
     return render_template('farmer.html')
@@ -101,19 +104,27 @@ def submit_form():
         comment = request.form.get('comment')
         num1 = request.form.get('num1')
         num = request.form.get('num')
+        num2 = request.form.get('num2')
         commesnt = request.form.get('signature')
         photo = request.files['photo']
+        photo1 = request.files['photo1']
         print(commesnt)
         if not os.path.exists(UPLOAD_FOLDER):
             os.makedirs(UPLOAD_FOLDER)
 
-        if photo and allowed_file(photo.filename):
+        if photo and allowed_file(photo.filename) and photo1 and allowed_file(photo1.filename):
+    # บันทึกไฟล์ภาพแรก
             filename = str(uuid.uuid4()) + '.' + photo.filename.rsplit('.', 1)[1].lower()
             photo_path = os.path.join(UPLOAD_FOLDER, filename)
             photo.save(photo_path)
+            
+            # บันทึกไฟล์ภาพที่สอง
+            filename1 = str(uuid.uuid4()) + '.' + photo1.filename.rsplit('.', 1)[1].lower()
+            photo_path1 = os.path.join(UPLOAD_FOLDER, filename1)
+            photo1.save(photo_path1)
 
         
-        pdf_file_name = f"{full_name}_{full_name2}.pdf"
+        pdf_file_name = f"VD{num}-{num1}-({num2})-(1)().pdf"
 
         pdf = FPDF()
         pdf.add_page()
@@ -122,7 +133,7 @@ def submit_form():
         pdf.set_font_size(14)
         pdf.rect(160, 10, 40, 7, 'D')
         pdf.set_xy(165, 8)  # กำหนดตำแหน่งเริ่มต้นของข้อความ
-        pdf.cell(40, 10, f"VD-{num1}-PL001-(1)", align='L')  # ใส่ข้อความลงในสี่เหลี่ยมผืนผ้
+        pdf.cell(40, 10, f"VD{num}-{num1}-({num2})-(1)()", align='L')  # ใส่ข้อความลงในสี่เหลี่ยมผืนผ้
         pdf.set_font_size(25)
         pdf.cell(200, 10, txt=f"", ln=True, align='L')
         pdf.cell(200, 10, txt="           แบบสำรวจความถูกต้องตามกฎหมายของ EUDR – ระดับแปลง", ln=True, align='L')
@@ -213,7 +224,7 @@ def submit_form():
         pdf.add_page()
         pdf.rect(160, 10, 40, 7, 'D')
         pdf.set_xy(165, 8)  # กำหนดตำแหน่งเริ่มต้นของข้อความ
-        pdf.cell(40, 10, f"VD-{num1}-PL001-(1)", align='L')  # ใส่ข้อความลงในสี่เหลี่ยมผืนผ้
+        pdf.cell(40, 10, f"VD{num}-{num1}-({num2})-(1)()", align='L')  # ใส่ข้อความลงในสี่เหลี่ยมผืนผ้
         pdf.set_font_size(16)
         pdf.cell(200, 10, txt=f"", ln=True, align='L')
         pdf.cell(200, 7, txt=f"", ln=True, align='L')
@@ -299,16 +310,16 @@ def submit_form():
         os.makedirs(folder_path, exist_ok=True)  # Create folder if it doesn't exis
         file_index = 1
         while os.path.exists(os.path.join(folder_path, pdf_file_name)):
-            pdf_file_name = f"{full_name}_{num}_{file_index}.pdf"
+            pdf_file_name = f"VD{num}-{num1}-({num2})-(1)(file_index).pdf"
             file_index += 1
 
         pdf_file_path = os.path.join(folder_path, pdf_file_name)
         pdf.output(pdf_file_path)
         
-        merge_pdfs_in_folder(folder_path, f"{full_name}_แปลงที่__{num}.pdf")
+        merge_pdfs_in_folder(folder_path, f"VD{num}-{num1}-({num2})-(1)().pdf")
 
 
-        pdf_file_name1 = f"{full_name}_{num}.pdf"
+        pdf_file_name1 = f"VD{num}-{num1}-({num2})-(2)().pdf"
         folder_path1 = os.path.join("img", full_name, num)
         os.makedirs(folder_path1, exist_ok=True)  # Create folder if it doesn't exis
         file_index = 1
@@ -317,11 +328,26 @@ def submit_form():
             pdf.add_page()
             pdf.image(photo_path, x=10, y=10, w=190)
         while os.path.exists(os.path.join(folder_path1, pdf_file_name1)):
-            pdf_file_name1 = f"{full_name}_{num}_{file_index}.pdf"
+            pdf_file_name1 = f"VD{num}-{num1}-({num2})-(2)({file_index}).pdf"
             file_index += 1
         pdf_file_path1 = os.path.join(folder_path1, pdf_file_name1)
         pdf.output(pdf_file_path1)
-        merge_pdfs_in_folder_img(folder_path1, f"หลักฐาน__{full_name}_แปลงที่__{num}.pdf")
+        merge_pdfs_in_folder_img(folder_path1, f"VD{num}-{num1}-({num2})-(2)().pdf")
+
+        # สร้าง PDF จากไฟล์ภาพที่สอง
+        pdf_file_name1 = f"VD{num}-{num1}-({num2})-(3)().pdf"
+        folder_path1 = os.path.join("img1", full_name, num)
+        os.makedirs(folder_path1, exist_ok=True)  # สร้างโฟลเดอร์ถ้ายังไม่มี
+        pdf1 = FPDF()
+        if photo1 and allowed_file(photo1.filename):
+            pdf1.add_page()
+            pdf1.image(photo_path1, x=10, y=10, w=190)
+        while os.path.exists(os.path.join(folder_path1, pdf_file_name1)):
+            pdf_file_name1 = f"VD{num}-{num1}-({num2})-(3)({file_index}).pdf"
+            file_index += 1
+        pdf_file_path1 = os.path.join(folder_path1, pdf_file_name1)
+        pdf1.output(os.path.join(folder_path1, pdf_file_name1))
+
 
         return send_file(pdf_file_path, as_attachment=True, mimetype='application/pdf')
     
@@ -368,13 +394,23 @@ def merge_pdfs_in_folder(folder_path, output_filename):
 def submit_form_pdpa():
     try:
         full_name = escape(request.form['full-name'])
-        full_name2 = escape(request.form['full-name2'])
+        full_name2 = escape(request.form['num'])
         signature_path = session.get('signature_path', None)
         pdpa1 = request.form.get('pdpa1')
         pdpa2 = request.form.get('pdpa2')
         pdpa3 = request.form.get('pdpa3')
-        current_date = datetime.now().strftime("%Y-%m-%d")      
-        pdf_file_name = f"{full_name}_PDPA.pdf"
+        current_date = datetime.now().strftime("%Y-%m-%d") 
+        photo = request.files['photo']
+        
+        if not os.path.exists(UPLOAD_FOLDER):
+            os.makedirs(UPLOAD_FOLDER)
+
+        if photo and allowed_file(photo.filename):
+            filename = str(uuid.uuid4()) + '.' + photo.filename.rsplit('.', 1)[1].lower()
+            photo_path = os.path.join(UPLOAD_FOLDER, filename)
+            photo.save(photo_path)
+
+        pdf_file_name = f"VD-{full_name2}.pdf"
         pdf = FPDF()
         pdf.add_page()
         pdf.add_font("THSarabun-Bold", "B", FONT_PATH1, uni=True)
@@ -500,9 +536,179 @@ def submit_form_pdpa():
         pdf_file_path = os.path.join("pdfs_pdpa", pdf_file_name)
         pdf.output(pdf_file_path)
 
+        pdf_file_name1 = f"VD-{full_name2}-ID.pdf"
+        folder_path1 = os.path.join("pdfs_pdpa", full_name2)
+        os.makedirs(folder_path1, exist_ok=True)  # Create folder if it doesn't exis
+        pdf = FPDF()
+        if photo and allowed_file(photo.filename):
+            pdf.add_page()
+            pdf.image(photo_path, x=10, y=10, w=190)
+        pdf_file_path1 = os.path.join(folder_path1, pdf_file_name1)
+        pdf.output(pdf_file_path1)
         return send_file(pdf_file_path, as_attachment=True, mimetype='application/pdf')
     except Exception as e:
         return f"An error occurred: {str(e)}", 500
+
+@app.route('/submit-form-pdpa1', methods=['POST'])
+def submit_form_pdpa1():
+    try:
+        full_name = escape(request.form['full-name'])
+        full_name2 = escape(request.form['num'])
+        signature_path = session.get('signature_path', None)
+        pdpa1 = request.form.get('pdpa1')
+        pdpa2 = request.form.get('pdpa2')
+        pdpa3 = request.form.get('pdpa3')
+        current_date = datetime.now().strftime("%Y-%m-%d") 
+        photo = request.files['photo']
+        num1 = escape(request.form['num1'])
+        
+        if not os.path.exists(UPLOAD_FOLDER):
+            os.makedirs(UPLOAD_FOLDER)
+
+        if photo and allowed_file(photo.filename):
+            filename = str(uuid.uuid4()) + '.' + photo.filename.rsplit('.', 1)[1].lower()
+            photo_path = os.path.join(UPLOAD_FOLDER, filename)
+            photo.save(photo_path)
+
+        pdf_file_name = f"VD-{full_name2}-PDPA-{num1}.pdf"
+        pdf = FPDF()
+        pdf.add_page()
+        pdf.add_font("THSarabun-Bold", "B", FONT_PATH1, uni=True)
+        pdf.set_font("THSarabun-Bold", style="B" , size=16)
+        pdf.set_font_size(14)
+        pdf.rect(160, 10, 40, 7, 'D')
+        pdf.set_xy(170, 8)  # กำหนดตำแหน่งเริ่มต้นของข้อความ
+        pdf.cell(40, 10, f"VD-{full_name2}-PDPA-{num1}", align='L')  # ใส่ข้อความลงในสี่เหลี่ยมผืนผ้
+        pdf.image('static/img4.jpg', x = 10, y = 20, w = 180)
+        pdf.cell(200, 20 , txt=" ", ln=True, align='L')
+        pdf.cell(200, 25, txt="", ln=True, align='C')
+        pdf.set_font_size(16)
+        pdf.cell(200, 12, txt=f"", ln=True, align='L')
+        pdf.cell(200, 5, txt="            เนื่องจาก บริษัท ทองไทยรับเบอร์ จำกัด และ บริษัทในเครือ ได้แก่ บริษัท แกรนด์รับเบอร์ ", ln=True, align='L')
+        pdf.cell(200, 5, txt="จำกัด บริษัท ทองไทย เทคนิคอล รับเบอร์ จำกัด บริษัท สินทองไทย รับเบอร์ จำกัด และบริษัท ทีทีเอ็น รับเบอร์ จำกัด ", ln=True, align='L')
+        pdf.cell(200, 5, txt="สำนักงานตั้งอยู่ที่เลขที่ 984/51-52 ถนนสุขุมวิท 71 แขวงคลองตันเหนือ เขตวัฒนา กรุงเทพมหานคร เป็นผู้ประกอบ", ln=True, align='L')
+        pdf.cell(200, 5, txt="ธุรกิจผลิตและส่งออกยางแผ่นรมควัน ยางแท่ง น้ำยางข้น ผลิตภัณฑ์ยางพาราไปยังต่างประเทศ", ln=True, align='L')
+        pdf.cell(200, 7, txt=f"", ln=True, align='L')
+        pdf.cell(200, 5, txt="            เนื่องจากสหภาพยุโรป ได้ประกาศใช้กฎหมายว่าด้วยสินค้าที่ปลอดจากการตัดไม้ทำลายป่า  ซึ่งกำหนดให้บริษัทต้อง", ln=True, align='L')
+        pdf.cell(200, 5, txt="แจ้งพิกัดตำแหน่ง (จีพีเอส) ของสวนยางพาราทั้งหมดที่ขายยางพาราให้แก่บริษัทเพื่อให้แน่ใจว่าสวนยางพาราเหล่านั้นไม่ได้", ln=True, align='L')
+        pdf.cell(200, 5, txt="ประเทศไทย (กยท.)หรือหน่วยงานราชการที่เกี่ยวข้อง ที่รับรองว่าสวนยางพาราที่ขายยางพาราให้แก่บริษัท มีการครอบครอง", ln=True, align='L')
+        pdf.cell(200, 5, txt="ธุรกิจผลิตและส่งออกยางแผ่นรมควัน ยางแท่ง น้ำยางข้น ผลิตภัณฑ์ยางพาราไปยังต่างประเทศ", ln=True, align='L')
+        pdf.cell(200, 5, txt="ที่ดินสวนยางพาราถูกต้องตามกฏหมาย ", ln=True, align='L')
+        pdf.cell(200, 7, txt=f"", ln=True, align='L')
+        pdf.cell(200, 5, txt="            การที่บริษัทสามารถส่งออกยางพาราไปยัง สหภาพยุโรป บริษัทจึงจำเป็นต้องเก็บรวบรวม ใช้ เปิดเผยและโอนข้อมูล", ln=True, align='L')
+        pdf.cell(200, 5, txt="ของท่านซึ่งเป็นเกษตรกรที่ขายยางพาราให้แก่บริษัทโดยบริษัทจะเก็บรวบรวมข้อมูลดังกล่าวผ่านทางเว็บพอร์ทัลของบริษัท", ln=True, align='L')
+        pdf.cell(200, 5, txt="คือ georubber.net เพื่อระบุพิกัดตำแหน่งของสวนยางพาราของท่านและเก็บรวบรวมข้อมูลของท่านซึ่งประกอบด้วยข้อมูล", ln=True, align='L')
+        pdf.cell(200, 5, txt="บัตรประชาชน เอกสารสิทธิ์ และสมุดทะเบียนเกษตรกรของท่าน  รวมถึงข้อมูลสวนยางของท่าน แล้วส่งพิกัดตำแหน่งสวน", ln=True, align='L')
+        pdf.cell(200, 5, txt="ยางพาราและข้อมูลของท่านพร้อมกับปริมาณยางพาราที่บริษัทซื้อจากท่านส่งให้ลูกค้า ", ln=True, align='L')
+        pdf.cell(200, 7, txt=f"", ln=True, align='L')
+        pdf.cell(200, 5, txt="            ดังนั้น เพื่อให้ท่านสามารถแจ้งพิกัดตำแหน่งสวนยางพาราและข้อมูลของท่านผ่านเว็บพอร์ทัล georubber.net ของ", ln=True, align='L')
+        pdf.cell(200, 5, txt="บริษัทและเพื่อให้บริษัทสามารถบริหารและจัดการข้อมูลพิกัดตำแหน่งสวนยางพาราและข้อมูลของท่านได้โดยถูกต้องตาม", ln=True, align='L')
+        pdf.cell(200, 5, txt="กฎหมายไทย บริษัทจึงขอความร่วมมือมายังท่านดังต่อไปนี้", ln=True, align='L')
+        # Checkboxes Q5
+        pdf.cell(200, 7, txt=f"", ln=True, align='L')
+        pdf.cell(200, 10, txt="กรุณาทำเครื่องหมายหน้าข้อเพื่อยืนยันการเข้าใจ และยินยอมให้ข้อมูลแก่บริบริษัท", ln=True)
+        if pdpa1:
+            pdf.cell(200, 5, txt="[X]    ท่านรับทราบและยินยอมให้บริษัทเก็บรวบรวม เปิดเผยข้อมูลส่วนบุคคลของท่าน ", ln=True)
+        else:
+            pdf.cell(200, 5, txt="[ ]    ท่านรับทราบและยินยอมให้บริษัทเก็บรวบรวม เปิดเผยข้อมูลส่วนบุคคลของท่าน ", ln=True)
+        if pdpa2:
+            pdf.cell(200, 5, txt="[X]    ท่านรับทราบและให้ความยินยอมว่าให้บริษัทเก็บรวบรวม เปิดเผย ข้อมูลของท่านและข้อมูลอื่นที่เกี่ยวกับท่านดังต่อไปนี้", ln=True)
+            pdf.cell(200, 5, txt="เท่าที่จำเป็นต่อการประกอบธุรกิจของบริษัทและตามนโยบายความเป็นส่วนตัวของบริษัทและเพื่อวัตถุประสงค์ที่กำหนด", ln=True)
+            pdf.cell(200, 5, txt="ไว้เท่านั้น กล่าวคือ", ln=True)
+            pdf.cell(200, 5, txt="            (ก)พิกัดตำแหน่งจีพีเอสของสวนยางพารา", ln=True)
+            pdf.cell(200, 5, txt="            (ข)ปีที่ปลูกต้นยางพารา", ln=True)
+            pdf.cell(200, 5, txt="            (ค)สำเนาบัตรประชาชนเจ้าของสวนยางพารา", ln=True) 
+            pdf.cell(200, 5, txt="            (ง)ปริมาณยางพาราจากแต่ละสวนยางพารา", ln=True)
+            pdf.cell(200, 5, txt="            (จ)ขนาดพื้นที่ของสวนยางพารา", ln=True)
+            pdf.cell(200, 5, txt="            (ฉ)สำเนาหลักฐานการใช้ประโยชน์ที่ดิน เช่น โฉนด สมุดกองทุนสงเคราะห์การทำสวนยาง สมุดประจำตัวเกษตกร", ln=True)
+            pdf.cell(200, 5, txt="                ชาวสวนยาง สมุดทะเบียนเกษตรกร", ln=True)
+        else:
+            pdf.cell(200, 5, txt="[ ]    ท่านรับทราบและให้ความยินยอมว่าให้บริษัทเก็บรวบรวม เปิดเผย ข้อมูลของท่านและข้อมูลอื่นที่เกี่ยวกับท่านดังต่อไปนี้", ln=True)
+            pdf.cell(200, 5, txt="เท่าที่จำเป็นต่อการประกอบธุรกิจของบริษัทและตามนโยบายความเป็นส่วนตัวของบริษัทและเพื่อวัตถุประสงค์ที่กำหนด", ln=True)
+            pdf.cell(200, 5, txt="ไว้เท่านั้น กล่าวคือ", ln=True)
+            pdf.cell(200, 5, txt="            (ก)พิกัดตำแหน่งจีพีเอสของสวนยางพารา", ln=True)
+            pdf.cell(200, 5, txt="            (ข)ปีที่ปลูกต้นยางพารา", ln=True)
+            pdf.cell(200, 5, txt="            (ค)สำเนาบัตรประชาชนเจ้าของสวนยางพารา", ln=True) 
+            pdf.cell(200, 5, txt="            (ง)ปริมาณยางพาราจากแต่ละสวนยางพารา", ln=True)
+            pdf.cell(200, 5, txt="            (จ)ขนาดพื้นที่ของสวนยางพารา", ln=True)
+            pdf.cell(200, 5, txt="            (ฉ)สำเนาหลักฐานการใช้ประโยชน์ที่ดิน เช่น โฉนด สมุดกองทุนสงเคราะห์การทำสวนยาง สมุดประจำตัวเกษตกร", ln=True)
+            pdf.cell(200, 5, txt="                ชาวสวนยาง สมุดทะเบียนเกษตรกร", ln=True)
+        pdf.image('static/img2.jpg', x = 50, y = 245, w = 100)
+        pdf.add_page()
+        pdf.set_font_size(14)
+        pdf.rect(160, 10, 40, 7, 'D')
+        pdf.set_xy(170, 8)  # กำหนดตำแหน่งเริ่มต้นของข้อความ
+        pdf.cell(40, 10, f"VD-{full_name2}-PDPA-{num1}", align='L')  # ใส่ข้อความลงในสี่เหลี่ยมผืนผ้
+        pdf.cell(200, 20 , txt=" ", ln=True, align='L')
+
+
+        pdf.image('static/img4.jpg', x = 10, y = 20, w = 180)
+        pdf.cell(200, 20, txt="", ln=True, align='L')
+        pdf.cell(200, 25, txt="", ln=True, align='C')
+        pdf.set_font_size(16)
+        if pdpa3:
+            pdf.cell(200, 22, txt=f"", ln=True, align='L')
+            pdf.cell(200, 5, txt="[X]         ท่านรับทราบและให้ความยินยอมให้บริษัทสามารถเปิดเผยข้อมูลของท่านไปยังประเทศอื่นเพื่อวัตถุประสงค์ที่", ln=True)
+            pdf.cell(200, 5, txt="กำหนดไว้ โดยก่อนการโอนข้อมูลส่วนบุคคลของท่านไปยังประเทศอื่นบริษัทจะดำเนินการเพื่อให้แน่ใจว่าบริษัทมี", ln=True)
+            pdf.cell(200, 5, txt="มาตรการป้องกันความปลอดภัยของข้อมูลที่เพียงพอหรือในระดับที่สูงกว่ามาตรการที่กำหนดไว้ตามกฎหมายคุ้มครอง", ln=True)
+            pdf.cell(200, 5, txt="ข้อมูลส่วนบุคคลของประเทศไทย ", ln=True)
+            pdf.cell(200, 5, txt="            หากท่านมีข้อสงสัยหรือข้อเสนอแนะเกี่ยวกับข้อมูลส่วนบุคคลของท่านหรือหนังสือยินยอมฉบับนี้หรือต้องการยื่นคำ", ln=True)
+            pdf.cell(200, 5, txt="ร้องเรียนต่อบริษัท ท่านสามารถติดต่อเจ้าหน้าที่คุ้มครองข้อมูลส่วนบุคคลหรือเจ้าหน้าที่อื่นที่เกี่ยวข้องของบริษัทดังต่อไปนี้", ln=True)
+        else:
+            pdf.cell(200, 5, txt="[ ]         ท่านรับทราบและให้ความยินยอมให้บริษัทสามารถเปิดเผยข้อมูลของท่านไปยังประเทศอื่นเพื่อวัตถุประสงค์ที่", ln=True)
+            pdf.cell(200, 5, txt="กำหนดไว้ โดยก่อนการโอนข้อมูลส่วนบุคคลของท่านไปยังประเทศอื่นบริษัทจะดำเนินการเพื่อให้แน่ใจว่าบริษัทมี", ln=True)
+            pdf.cell(200, 5, txt="มาตรการป้องกันความปลอดภัยของข้อมูลที่เพียงพอหรือในระดับที่สูงกว่ามาตรการที่กำหนดไว้ตามกฎหมายคุ้มครอง", ln=True)
+            pdf.cell(200, 5, txt="ข้อมูลส่วนบุคคลของประเทศไทย ", ln=True)
+            pdf.cell(200, 5, txt="            หากท่านมีข้อสงสัยหรือข้อเสนอแนะเกี่ยวกับข้อมูลส่วนบุคคลของท่านหรือหนังสือยินยอมฉบับนี้หรือต้องการยื่นคำ", ln=True)
+            pdf.cell(200, 5, txt="ร้องเรียนต่อบริษัท ท่านสามารถติดต่อเจ้าหน้าที่คุ้มครองข้อมูลส่วนบุคคลหรือเจ้าหน้าที่อื่นที่เกี่ยวข้องของบริษัทดังต่อไปนี้", ln=True)
+        
+
+        pdf.cell(200, 7, txt=f"", ln=True, align='L')
+        pdf.cell(200, 5, txt="            ชื่อ คุณซือชิง เชียน   (ผู้จัดการด้านความรับผิดชอบต่อสังคมและสิ่งแวดล้อม)", ln=True)
+        pdf.cell(200, 5, txt="            เบอร์โทรศัพท์        (02) 390-2051", ln=True)
+        pdf.cell(200, 5, txt="            อีเมล์               eudr@tongthai.co.th", ln=True)
+
+        pdf.cell(200, 5, txt="            บริษัทขอขอบคุณท่านเป็นอย่างยิ่งที่กรุณาให้ความร่วมมือและให้ความยินยอมตามที่บริษัทขอมาข้างต้น", ln=True)
+        pdf.cell(200, 5, txt="                บริษัท ทองไทยรับเบอร์ จำกัด     บริษัท แกรนด์รับเบอร์ จำกัด", ln=True)
+        pdf.cell(200, 5, txt="                บริษัท ทองไทย เทคนิคอล รับเบอร์ จำกัด    บริษัท สินทองไทย รับเบอร์ จำกัด", ln=True)
+        pdf.cell(200, 5, txt="                บริษัท ทีทีเอ็น รับเบอร์ จำกัด", ln=True)
+        pdf.cell(200, 7, txt=f"", ln=True, align='L')
+        pdf.cell(200, 5, txt="การเข้าร่วมในการสำรวจนี้เป็นอิสระ คุณสามารถถอนตัวออกจากการสำรวจได้ตลอดเวลาโดยการติดต่อที่ eudr@tongthai.co.th", ln=True)
+
+        if signature_path:
+            # Use signature image in PDF
+            pdf.image(signature_path, x=50, y=180, w=30)
+        pdf.rect(10, 180, 140, 20, 'D')
+        pdf.set_xy(10, 175)  # กำหนดตำแหน่งเริ่มต้นของข้อความ
+        pdf.cell(170, 20, "ลงลายชื่อ :", align='L')  # ใส่ข้อความลงในสี่เหลี่ยมผืนผ้
+        pdf.rect(150, 180, 50, 20, 'D')
+        pdf.set_xy(150, 175)  # กำหนดตำแหน่งเริ่มต้นของข้อความ
+        pdf.cell(40, 20, f"วันที่ : {current_date}", align='L')  # ใส่ข้อความลงในสี่เหลี่ยมผืนผ้
+        
+        pdf.rect(10, 200, 190, 10, 'D')
+        pdf.set_xy(10, 200)  # กำหนดตำแหน่งเริ่มต้นของข้อความ
+        pdf.cell(190, 10, f"ชื่อและนามสกุล :       {full_name}", align='L')  # ใส่ข้อความลงในสี่เหลี่ยมผืนผ้
+
+        # if photo and allowed_file(photo.filename):
+        #     pdf.add_page()
+        #     pdf.image(photo_path, x=10, y=10, w=190)
+
+        pdf_file_path = os.path.join("pdpa", pdf_file_name)
+        pdf.output(pdf_file_path)
+
+        pdf_file_name1 = f"VD-{full_name2}-PDPA-{num1}-ID.pdf"
+        folder_path1 = os.path.join("pdpa", full_name2)
+        os.makedirs(folder_path1, exist_ok=True)  # Create folder if it doesn't exis
+        pdf = FPDF()
+        if photo and allowed_file(photo.filename):
+            pdf.add_page()
+            pdf.image(photo_path, x=10, y=10, w=190)
+        pdf_file_path1 = os.path.join(folder_path1, pdf_file_name1)
+        pdf.output(pdf_file_path1)
+        return send_file(pdf_file_path, as_attachment=True, mimetype='application/pdf')
+    except Exception as e:
+        return f"An error occurred: {str(e)}", 500
+
 
 @app.route('/submit-form-farmer', methods=['POST'])
 def submit_form_farmer():
@@ -580,7 +786,7 @@ def submit_form_farmer():
         o50= request.form.get('o50')
         o51= request.form.get('o51')
         num= request.form.get('num')
-
+        num1= request.form.get('num1')
         current_date = datetime.now().strftime("%Y-%m-%d")
         photo = request.files['photo']
         if not os.path.exists(UPLOAD_FOLDER):
@@ -592,7 +798,7 @@ def submit_form_farmer():
             photo.save(photo_path)
 
         
-        pdf_file_name = f"{Farm}_{Farm1}.pdf"
+        pdf_file_name = f"VD-{num}-PDPA{num1}-FL.pdf"
 
         pdf = FPDF()
         pdf.add_page()                                                                                                                                                              
@@ -602,7 +808,7 @@ def submit_form_farmer():
         pdf.set_font_size(14)
         pdf.rect(160, 10, 40, 7, 'D')
         pdf.set_xy(170, 8)  # กำหนดตำแหน่งเริ่มต้นของข้อความ
-        pdf.cell(40, 10, f"VD-{num}-PL", align='L')  # ใส่ข้อความลงในสี่เหลี่ยมผืนผ้
+        pdf.cell(40, 10, f"VD-{num}-PDPA{num1}-FL", align='L')  # ใส่ข้อความลงในสี่เหลี่ยมผืนผ้
         pdf.cell(200, 12, txt=f"", ln=True, align='L')
 
         pdf.set_font_size(25)
@@ -719,7 +925,7 @@ def submit_form_farmer():
         pdf.set_font_size(14)
         pdf.rect(160, 10, 40, 7, 'D')
         pdf.set_xy(170, 8)  # กำหนดตำแหน่งเริ่มต้นของข้อความ
-        pdf.cell(40, 10, f"VD-{num}-PL", align='L')  # ใส่ข้อความลงในสี่เหลี่ยมผืนผ้
+        pdf.cell(40, 10, f"VD-{num}-PDPA{num1}-FL", align='L')  # ใส่ข้อความลงในสี่เหลี่ยมผืนผ้
         pdf.cell(200, 12, txt=f"", ln=True, align='L')
         pdf.set_font_size(16)      
         # Question 3.4
@@ -850,7 +1056,7 @@ def submit_form_farmer():
         pdf.rect(160, 10, 40, 7, 'D')
         pdf.set_xy(165, 8)  # กำหนดตำแหน่งเริ่มต้นของข้อความ
         pdf.set_xy(170, 8)  # กำหนดตำแหน่งเริ่มต้นของข้อความ
-        pdf.cell(40, 10, f"VD-{num}-PL", align='L')  # ใส่ข้อความลงในสี่เหลี่ยมผืนผ้
+        pdf.cell(40, 10, f"VD-{num}-PDPA{num1}-FL", align='L')  # ใส่ข้อความลงในสี่เหลี่ยมผืนผ้
         pdf.set_font_size(16)   
         pdf.cell(200, 7, txt=f"", ln=True, align='L')
         pdf.cell(200, 5, txt=f"         สำหรับผู้ที่อายุต่ำกว่า 15 ปี for those age under 15 years old", ln=True, align='L')                 
@@ -956,12 +1162,18 @@ def submit_form_farmer():
  
 
 
+        folder_path = os.path.join("pdfs_farmer", Farm, num)
+        os.makedirs(folder_path, exist_ok=True)  # Create folder if it doesn't exis
+        pdf_file_path = os.path.join(folder_path, pdf_file_name)
+        pdf.output(pdf_file_path)
+        
+        pdf_file_name1 =  f"VD-{num}-PDPA-{num1}-ID.pdf"
+        pdf = FPDF()
         if photo and allowed_file(photo.filename):
             pdf.add_page()
             pdf.image(photo_path, x=10, y=10, w=190)
-
-        pdf_file_path = os.path.join("pdfs_farmer", pdf_file_name)
-        pdf.output(pdf_file_path)
+        pdf_file_path1 = os.path.join(folder_path, pdf_file_name1)
+        pdf.output(pdf_file_path1)
 
         return send_file(pdf_file_path, as_attachment=True, mimetype='application/pdf')
     except Exception as e:
@@ -995,4 +1207,4 @@ def pdf():
 
 
 if __name__ == '__main__':
-    app.run(host='192.168.0.251', port=5000)
+    app.run(port=5000)
