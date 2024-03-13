@@ -105,6 +105,7 @@ def submit_form():
         num1 = request.form.get('num1')
         num = request.form.get('num')
         num2 = request.form.get('num2')
+        num3 = request.form.get('num3')
         commesnt = request.form.get('signature')
         photo = request.files['photo']
         photo1 = request.files['photo1']
@@ -124,7 +125,7 @@ def submit_form():
             photo1.save(photo_path1)
 
         
-        pdf_file_name = f"VD{num}-{num1}-({num2})-(1)().pdf"
+        pdf_file_name = f"VD{num}-{num1}-(1)-(1)({num3}).pdf"
 
         pdf = FPDF()
         pdf.add_page()
@@ -132,8 +133,8 @@ def submit_form():
         pdf.set_font("THSarabun-Bold", style="B" , size=16)
         pdf.set_font_size(14)
         pdf.rect(160, 10, 40, 7, 'D')
-        pdf.set_xy(165, 8)  # กำหนดตำแหน่งเริ่มต้นของข้อความ
-        pdf.cell(40, 10, f"VD{num}-{num1}-({num2})-(1)()", align='L')  # ใส่ข้อความลงในสี่เหลี่ยมผืนผ้
+        pdf.set_xy(160, 8)  # กำหนดตำแหน่งเริ่มต้นของข้อความ
+        pdf.cell(40, 10, f"VD{num}-{num1}-(1)({num3})", align='L')  # ใส่ข้อความลงในสี่เหลี่ยมผืนผ้
         pdf.set_font_size(25)
         pdf.cell(200, 10, txt=f"", ln=True, align='L')
         pdf.cell(200, 10, txt="           แบบสำรวจความถูกต้องตามกฎหมายของ EUDR – ระดับแปลง", ln=True, align='L')
@@ -223,8 +224,8 @@ def submit_form():
         # Checkboxes Q9
         pdf.add_page()
         pdf.rect(160, 10, 40, 7, 'D')
-        pdf.set_xy(165, 8)  # กำหนดตำแหน่งเริ่มต้นของข้อความ
-        pdf.cell(40, 10, f"VD{num}-{num1}-({num2})-(1)()", align='L')  # ใส่ข้อความลงในสี่เหลี่ยมผืนผ้
+        pdf.set_xy(160, 8)  # กำหนดตำแหน่งเริ่มต้นของข้อความ
+        pdf.cell(40, 10, f"VD{num}-{num1}-(1)-(1)({num3})", align='L')  # ใส่ข้อความลงในสี่เหลี่ยมผืนผ้
         pdf.set_font_size(16)
         pdf.cell(200, 10, txt=f"", ln=True, align='L')
         pdf.cell(200, 7, txt=f"", ln=True, align='L')
@@ -310,16 +311,16 @@ def submit_form():
         os.makedirs(folder_path, exist_ok=True)  # Create folder if it doesn't exis
         file_index = 1
         while os.path.exists(os.path.join(folder_path, pdf_file_name)):
-            pdf_file_name = f"VD{num}-{num1}-({num2})-(1)(file_index).pdf"
+            pdf_file_name = f"VD{num}-{num1}-(1)-(1)({num3}).pdf"
             file_index += 1
 
         pdf_file_path = os.path.join(folder_path, pdf_file_name)
         pdf.output(pdf_file_path)
         
-        merge_pdfs_in_folder(folder_path, f"VD{num}-{num1}-({num2})-(1)().pdf")
+        merge_pdfs_in_folder(folder_path, f"VD{num}-{num1}-(1)({num3}).pdf")
 
 
-        pdf_file_name1 = f"VD{num}-{num1}-({num2})-(2)().pdf"
+        pdf_file_name1 = f"VD{num}-{num1}-(2)-(1)({num3}).pdf"
         folder_path1 = os.path.join("img", full_name, num)
         os.makedirs(folder_path1, exist_ok=True)  # Create folder if it doesn't exis
         file_index = 1
@@ -328,14 +329,14 @@ def submit_form():
             pdf.add_page()
             pdf.image(photo_path, x=10, y=10, w=190)
         while os.path.exists(os.path.join(folder_path1, pdf_file_name1)):
-            pdf_file_name1 = f"VD{num}-{num1}-({num2})-(2)({file_index}).pdf"
+            pdf_file_name1 = f"VD{num}-{num1}-(2)-(1)({num3}).pdf"
             file_index += 1
         pdf_file_path1 = os.path.join(folder_path1, pdf_file_name1)
         pdf.output(pdf_file_path1)
-        merge_pdfs_in_folder_img(folder_path1, f"VD{num}-{num1}-({num2})-(2)().pdf")
+        merge_pdfs_in_folder_img(folder_path1, f"VD{num}-{num1}-(2)-(1)({num3}).pdf")
 
         # สร้าง PDF จากไฟล์ภาพที่สอง
-        pdf_file_name1 = f"VD{num}-{num1}-({num2})-(3)().pdf"
+        pdf_file_name1 = f"VD{num}-{num1}-(3)-()({num3}).pdf"
         folder_path1 = os.path.join("img1", full_name, num)
         os.makedirs(folder_path1, exist_ok=True)  # สร้างโฟลเดอร์ถ้ายังไม่มี
         pdf1 = FPDF()
@@ -343,7 +344,7 @@ def submit_form():
             pdf1.add_page()
             pdf1.image(photo_path1, x=10, y=10, w=190)
         while os.path.exists(os.path.join(folder_path1, pdf_file_name1)):
-            pdf_file_name1 = f"VD{num}-{num1}-({num2})-(3)({file_index}).pdf"
+            pdf_file_name1 = f"VD{num}-{num1}-(3)-(1)({num3}).pdf"
             file_index += 1
         pdf_file_path1 = os.path.join(folder_path1, pdf_file_name1)
         pdf1.output(os.path.join(folder_path1, pdf_file_name1))
@@ -367,8 +368,9 @@ def submit_form():
         # pdf.output(pdf_file_path)
         
         # Check if the folder already exists, if yes, append a number
+from PyPDF2 import PdfMerger
 def merge_pdfs_in_folder_img(folder_path1, output_filename):
-    merger = PdfFileMerger()
+    merger = PdfMerger()
 
     for filename in os.listdir(folder_path1):
         if filename.endswith('.pdf'):
@@ -378,8 +380,9 @@ def merge_pdfs_in_folder_img(folder_path1, output_filename):
     merger.write(output_filename)
     merger.close()
 
+
 def merge_pdfs_in_folder(folder_path, output_filename):
-    merger = PdfFileMerger()
+    merger = PdfMerger()
 
     for filename in os.listdir(folder_path):
         if filename.endswith('.pdf'):
@@ -577,7 +580,7 @@ def submit_form_pdpa1():
         pdf.set_font("THSarabun-Bold", style="B" , size=16)
         pdf.set_font_size(14)
         pdf.rect(160, 10, 40, 7, 'D')
-        pdf.set_xy(170, 8)  # กำหนดตำแหน่งเริ่มต้นของข้อความ
+        pdf.set_xy(160, 8)  # กำหนดตำแหน่งเริ่มต้นของข้อความ
         pdf.cell(40, 10, f"VD-{full_name2}-PDPA-{num1}", align='L')  # ใส่ข้อความลงในสี่เหลี่ยมผืนผ้
         pdf.image('static/img4.jpg', x = 10, y = 20, w = 180)
         pdf.cell(200, 20 , txt=" ", ln=True, align='L')
@@ -637,7 +640,7 @@ def submit_form_pdpa1():
         pdf.add_page()
         pdf.set_font_size(14)
         pdf.rect(160, 10, 40, 7, 'D')
-        pdf.set_xy(170, 8)  # กำหนดตำแหน่งเริ่มต้นของข้อความ
+        pdf.set_xy(160, 8)  # กำหนดตำแหน่งเริ่มต้นของข้อความ
         pdf.cell(40, 10, f"VD-{full_name2}-PDPA-{num1}", align='L')  # ใส่ข้อความลงในสี่เหลี่ยมผืนผ้
         pdf.cell(200, 20 , txt=" ", ln=True, align='L')
 
@@ -807,7 +810,7 @@ def submit_form_farmer():
 
         pdf.set_font_size(14)
         pdf.rect(160, 10, 40, 7, 'D')
-        pdf.set_xy(170, 8)  # กำหนดตำแหน่งเริ่มต้นของข้อความ
+        pdf.set_xy(160, 8)  # กำหนดตำแหน่งเริ่มต้นของข้อความ
         pdf.cell(40, 10, f"VD-{num}-PDPA{num1}-FL", align='L')  # ใส่ข้อความลงในสี่เหลี่ยมผืนผ้
         pdf.cell(200, 12, txt=f"", ln=True, align='L')
 
@@ -821,7 +824,7 @@ def submit_form_farmer():
         pdf.cell(200, 7, txt=f"", ln=True, align='L')
         pdf.cell(200, 5, txt=f"Q.2     มีสวนยางทั้งหมดกี่แปลง (ขั้นต่ำ: 0, สูงสุด: 1,000)", ln=True, align='L')    
         pdf.cell(200, 5, txt=f"Number of natural rubber plots (Min: 0, Max: 1000)", ln=True, align='L')
-        pdf.cell(200, 5, txt=f"          _______{Farm1}____กก./เดือน (kg/month) ", ln=True, align='L')
+        pdf.cell(200, 5, txt=f"          _______{Farm1}____", ln=True, align='L')
         pdf.cell(200, 7, txt=f"", ln=True, align='L')
         pdf.cell(200, 5, txt=f"Q.3     นอกจากตัวท่านแล้ว มีสมาชิกในครอบครัวอยู่ในพื้นที่นี้หรือไม่ Other than the farmer", ln=True, align='L')
         pdf.cell(200, 5, txt=f"          are there any additional household members staying on or around the land?", ln=True, align='L')
@@ -924,7 +927,7 @@ def submit_form_farmer():
         pdf.add_page()
         pdf.set_font_size(14)
         pdf.rect(160, 10, 40, 7, 'D')
-        pdf.set_xy(170, 8)  # กำหนดตำแหน่งเริ่มต้นของข้อความ
+        pdf.set_xy(160, 8)  # กำหนดตำแหน่งเริ่มต้นของข้อความ
         pdf.cell(40, 10, f"VD-{num}-PDPA{num1}-FL", align='L')  # ใส่ข้อความลงในสี่เหลี่ยมผืนผ้
         pdf.cell(200, 12, txt=f"", ln=True, align='L')
         pdf.set_font_size(16)      
@@ -1054,8 +1057,7 @@ def submit_form_farmer():
         pdf.add_page()
         pdf.set_font_size(14)
         pdf.rect(160, 10, 40, 7, 'D')
-        pdf.set_xy(165, 8)  # กำหนดตำแหน่งเริ่มต้นของข้อความ
-        pdf.set_xy(170, 8)  # กำหนดตำแหน่งเริ่มต้นของข้อความ
+        pdf.set_xy(160, 8)  # กำหนดตำแหน่งเริ่มต้นของข้อความ
         pdf.cell(40, 10, f"VD-{num}-PDPA{num1}-FL", align='L')  # ใส่ข้อความลงในสี่เหลี่ยมผืนผ้
         pdf.set_font_size(16)   
         pdf.cell(200, 7, txt=f"", ln=True, align='L')
@@ -1207,4 +1209,4 @@ def pdf():
 
 
 if __name__ == '__main__':
-    app.run(port=5000)
+    app.run(port=9999)
